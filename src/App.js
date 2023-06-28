@@ -55,6 +55,7 @@ import UserMessage from './component/UserMessage';
 import EmailLogin from './component/EmailLogin';
 import Deposit from './component/Deposit';
 import ConnectWallet from './component/ConnectWallet';
+import TermsAndCondition from './component/TermsAndCondition'
 
 
 
@@ -118,6 +119,7 @@ function App() {
                 <Route path='/faq-how-to-buy-an-nft' element={<HowToBuyAnNFT />} />
                     <Route path='/faq-how-to-create-an-nft' element={<FaqCreateNft />} />
                 <Route path='/faq-who-is-tritonsprime' element={<WhoIsTritons />} />
+                <Route path='/terms-and-condition' element={<TermsAndCondition />} />
               </Route>
 
 
