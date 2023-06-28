@@ -1316,7 +1316,7 @@ small {
 }
 
 .collection--card {
-  width: 100%;
+  width: 270px;
   height: 350px;
   border-radius: 10px;
   overflow: hidden;
@@ -1430,6 +1430,7 @@ small {
   width: 200px;
   height: 200px;
   margin: 0 auto;
+  object-fit: fill;
 }
 
 .image--span:hover img {
@@ -1926,6 +1927,32 @@ small {
 
 .admin--panel--page{
   margin-top: 40px;
+}
+
+.deposit--sect{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  margin-top: 40px;
+  
+}
+.deposit--sect input{
+  width: 50%;
+}
+.deposit--btn{
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #000;
+  color: #fff;
+  outline: none;
+  border: none;
+  border-radius: 5px;
+
+}
+.nft-create-text{
+  color: #fff;
 }
 /* ------------add responsive----------  */
 
