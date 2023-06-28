@@ -62,6 +62,7 @@ const Footer = () => {
                     <ul>
                         <li><Link to={'/support-request'} style={{color : `${darkmode ? '#000' : '#fff'}`, textDecoration : 'none'}}>Contact Us </Link></li>
                         <li><Link to={'/faq-who-is-tritonsprime'} style={{color : `${darkmode ? '#000' : '#fff'}`, textDecoration : 'none'}}>About</Link></li>
+                        <li><Link to={'/terms-and-condition'} style={{color : `${darkmode ? '#000' : '#fff'}`, textDecoration : 'none'}}>Terms and condition</Link></li>
                         <li><Link to={'/faq-quick-answer'} style={{color : `${darkmode ? '#000' : '#fff'}`, textDecoration : 'none'}}>Faq</Link></li>
                         {auth?.roles?.includes(5150) && <li><Link to={'/admin-panel'} style={{color : `${darkmode ? '#000' : '#fff'}`, textDecoration : 'none'}}>Admin Panel</Link></li>}
                     </ul>
@@ -75,7 +76,7 @@ const Footer = () => {
                     </div>
             </div>
             <div className='footer--copyright' style={{color : `${darkmode ? '#000' : '#fff'}` }}>
-                {new Date().getFullYear()} &copy; TritonsPrime
+              2020 - {new Date().getFullYear()} &copy; TritonsPrime
             </div>
 
         </footer>

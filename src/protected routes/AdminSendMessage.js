@@ -26,6 +26,7 @@ const AdminSendMessage = () => {
     const [title, setTitle] = useState('')
     const [body, setBody] = useState('');
     const [User, setUser] = useState('');
+    const [authLoading, setAuthLoading] = useState
 
 
     const usersOpt = (

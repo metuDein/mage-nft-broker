@@ -140,7 +140,7 @@ const CreateNft = () => {
                             Price <span><FaEthereum/></span>
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             id='file-price'
                             placeholder='Enter price of item'
                             onChange={handlePriceChange}
@@ -167,7 +167,7 @@ const CreateNft = () => {
                             <small>The number of items that can be minted.</small>
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             id='file-price'
                             placeholder='Enter total amount available'
                             onChange={handleSupplyChange}

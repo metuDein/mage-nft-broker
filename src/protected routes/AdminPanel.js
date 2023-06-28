@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useEffect } from 'react'
 import AdminPanelCard from './AdminPanelCard'
-import { faGears, faUsersGear, faFolderOpen, faUser, faFolderPlus, faMessage} from '@fortawesome/free-solid-svg-icons'
+import { faGears, faUsersGear, faFolderOpen, faUser, faFolderPlus, faMessage, faReply} from '@fortawesome/free-solid-svg-icons'
 import DataContext from '../context/DataContext'
 
 const AdminPanel = () => {
@@ -28,7 +28,7 @@ const AdminPanel = () => {
                 </div>
             <div className='admin-panel'>
                 <AdminPanelCard title={'user settings'} icon={faUsersGear} pagelink={'/admin-panel-users'}/>
-                <AdminPanelCard title={'Admin settings'} icon={faGears} pagelink={''}/>
+                <AdminPanelCard title={'send message'} icon={faReply} pagelink={'/admin-panel-send-message'}/>
                 {/* <AdminPanelCard title={'Collections'} icon={faFolderOpen} pagelink={''}/> */}
                 <AdminPanelCard title={'Create User'} icon={faUser} pagelink={'/admin-panel-create-user'} />
                 <AdminPanelCard title={'View Assets'} icon={faFolderOpen} pagelink={'/admin-panel-assets'} />

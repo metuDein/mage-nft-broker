@@ -71,7 +71,7 @@ const UserMessage = () => {
                   <p> sent from : TritonsPrime Admin </p>
                   
                  </div>   
-                 <img src={getImgUrl(message.image)} alt=""  width={'100%'} height={'200px'} style={{objectFit : 'contain', flexGrow : '1', margin : '10px 0'}}/>
+                 {message?.image && <img src={getImgUrl(message.image)} alt=""  width={'100%'} height={'200px'} style={{objectFit : 'contain', flexGrow : '1', margin : '10px 0'}}/>}
 
                <span style={{padding : '10px', textAlign: 'center'}}> {message.body} </span>
                </div>
