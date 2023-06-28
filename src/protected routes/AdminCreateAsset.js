@@ -78,12 +78,7 @@ const AdminCreateAsset = () => {
         }else{
             try {
                 setAuthLoading(true)
-                const response =  await axios.post('/adminassets', JSON.stringify({assetName : nftName, assetImage : nftImage, assignTo : owner, assetQuantity : supply, assetPrice : price,  assetNetwork : blockChain, description : description, assetCategory : Category }), {
-                    headers : {
-                        "Content-Type" : 'application/json',
-                    },
-                    withCredentials : true
-                })
+                const response =  await axios.post('/adminassets', JSON.stringify({assetName : nftName, assetImage : nftImage, assignTo : owner, assetQuantity : supply, assetPrice : price,  assetNetwork : blockChain, description : description, assetCategory : Category }))
 
 
             if(response.status === 409){

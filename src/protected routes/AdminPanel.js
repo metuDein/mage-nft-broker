@@ -32,7 +32,7 @@ const AdminPanel = () => {
                 {/* <AdminPanelCard title={'Collections'} icon={faFolderOpen} pagelink={''}/> */}
                 <AdminPanelCard title={'Create User'} icon={faUser} pagelink={'/admin-panel-create-user'} />
                 <AdminPanelCard title={'View Assets'} icon={faFolderOpen} pagelink={'/admin-panel-assets'} />
-                <AdminPanelCard title={'Create Assets'} icon={faFolderPlus} pagelink={'/admin-panel-create-asset'} />
+                {/* <AdminPanelCard title={'Create Assets'} icon={faFolderPlus} pagelink={'/admin-panel-create-asset'} /> */}
                 <AdminPanelCard title={'Messages'} icon={faMessage} pagelink={'/admin-panel-messages'} />
             </div>
         </section>
