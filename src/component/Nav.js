@@ -92,7 +92,7 @@ const Nav = () => {
       </form>
       {auth?.user && <span className='balance'> <span> Balance : </span><FaEthereum />  {` ${ auth.user.balance } `}  </span>}
       <div className='connect-wallet' >
-        <h3 className="connect--title"><span style={{ marginRight: '3px' }}><FontAwesomeIcon icon={faWallet} /></span> {!auth?.user && <Link to={'/walletlogin'} style={{color  : '#fff', textDecoration : 'none'}}> <span className='connect--title--text'> Connect your wallet </span></Link> }   { auth.user &&  <span className='connect--title--text'> Account Connected </span>} {auth.user && <span className='media--balance'><FaEthereum />  {` ${ auth.user.balance } `} </span>}</h3>
+        <h3 className="connect--title"><span style={{ marginRight: '3px' }}><FontAwesomeIcon icon={faWallet} /></span> {!auth?.user && <Link to={'/walletlogin'} style={{color  : '#fff', textDecoration : 'none'}}> <span className='connect--title--text'> Connect your wallet </span></Link> }   { auth?.user &&  <span className='connect--title--text'> Account Connected </span>} {auth.user && <span className='media--balance'><FaEthereum />  {` ${ auth.user.balance } `} </span>}</h3>
         <FontAwesomeIcon icon={faUser} style={{ marginLeft: '8px', borderRadius: '50%', border: '1px solid #777', padding: '3px', width: '15px', height: '15px', fontSize: '14px' }}  onClick={handleMenuTab}/>
         <ul className={`nav-dropdown ${menuTab ? 'active' : ''}`}>
           {

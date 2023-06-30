@@ -121,9 +121,7 @@ const EmailLogin = () => {
                     navigate(from, { replace: true });
                 }, 3000);
 
-            } else {
-
-            }
+            } 
         } catch (error) {
             console.log(error.response.data)
             console.log(error.response.message)

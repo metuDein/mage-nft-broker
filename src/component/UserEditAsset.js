@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { storage } from '../firebase';
+import { uploadBytes, listAll, ref, getDownloadURL, } from 'firebase/storage';
 
 import DataContext from '../context/DataContext';
 import useAuth from '../hook/useAuth';
@@ -10,23 +12,26 @@ import useAuth from '../hook/useAuth';
 const UserEditAsset = () => {
 
     const { id } = useParams();
-    const { getImgUrl,  allAssets, setAllAssets } = useContext(DataContext);
+    const { getImgUrl, allAssets, setAllAssets } = useContext(DataContext);
 
     // const thisAsset = myAssets.find( asset => asset._id === id);
     const navigate = useNavigate()
     const { auth } = useAuth()
 
     const [asset, setAsset] = useState([]);
-    
+
 
     const aAsset = allAssets.find(asset => asset._id === id);
     // console.log(thisAsset);
     console.log(aAsset);
 
-   
+
 
     const [assetName, setAssetName] = useState(aAsset.name);
     const [assetImage, setAssetImage] = useState(aAsset.image);
+    const [uploadImage, setUploadImage] = useState(aAsset.image);
+
+
     const [assetPrice, setAssetPrice] = useState(aAsset.price);
     const [assetSupply, setAssetSupply] = useState(aAsset.block_number_minted);
     const [assetOwner, setAssetOwner] = useState(aAsset.OwnerName);
@@ -34,6 +39,7 @@ const UserEditAsset = () => {
     const [assetDescription, setAssetDescription] = useState(aAsset.description);
     const [assetCategory, setAssetCategory] = useState(aAsset.categories);
     const [authLoading, setAuthLoading] = useState(false);
+    const listRef = ref(storage, "nftimages/")
 
 
 
@@ -41,6 +47,7 @@ const UserEditAsset = () => {
     const handleImageChange = (e) => {
         console.log(e);
 
+        setUploadImage(e.target.files[0])
         const reader = new FileReader();
         reader.readAsDataURL(e.target.files[0]);
 
@@ -85,36 +92,80 @@ const UserEditAsset = () => {
 
 
     const handleAssetUpdate = async (e) => {
-
         e.preventDefault();
-
         if (!id) return window.alert('user asset id required');
-        try{
-            setAuthLoading(true)
-        const response = await axios.put('/userassets', JSON.stringify({ id: id, desc : assetDescription, price: assetPrice, supply: assetSupply, category: assetCategory, image: assetImage, blockchain : assetNetwork}));
 
-        console.log(response.data)
-        console.log(response.status)
-        console.log(response.message)
-        if(response.status === 200) {
-            setAuthLoading(false);
 
-            setAllAssets(old => {
-                const others = old.filter(item => item._id !== id);
-                const allAsset = [...others, response.data.result];
+        let uploadImg;
 
-                return allAsset;
-            })
-            
-            window.alert('update successful');
+
+        if (uploadImage) {
+            try {
+                setAuthLoading(true);
+
+
+                const imageRef = ref(storage, `nftimages/${uploadImage?.name}`)
+                const snapshot = await uploadBytes(imageRef, uploadImage);
+                const url = await getDownloadURL(snapshot.ref);
+                uploadImg = url;
+                console.log(uploadImg);
+
+
+                const response = await axios.put('/userassets', JSON.stringify({ id: id, desc: assetDescription, price: assetPrice, supply: assetSupply, category: assetCategory, image: uploadImg, blockchain: assetNetwork }));
+
+                console.log(response.data)
+                console.log(response.status)
+                console.log(response.message)
+                if (response.status === 200) {
+                    setAuthLoading(false);
+
+                    setAllAssets(old => {
+                        const others = old.filter(item => item._id !== id);
+                        const allAsset = [...others, response.data.result];
+
+                        return allAsset;
+                    })
+
+                    window.alert('update successful');
+                }
+
+                if (response.status === 400) window.alert('update failed')
+            } catch (error) {
+                console.log(error.response.status)
+                console.log(error.response.message)
+                window.alert('update failed')
+            }
+        } else {
+
+
+            try {
+
+                const response = await axios.put('/userassets', JSON.stringify({ id: id, desc: assetDescription, price: assetPrice, supply: assetSupply, category: assetCategory, image: assetImage, blockchain: assetNetwork }));
+
+                console.log(response.data)
+                console.log(response.status)
+                console.log(response.message)
+                if (response.status === 200) {
+                    setAuthLoading(false);
+
+                    setAllAssets(old => {
+                        const others = old.filter(item => item._id !== id);
+                        const allAsset = [...others, response.data.result];
+
+                        return allAsset;
+                    })
+
+                    window.alert('update successful');
+                }
+
+                if (response.status === 400) window.alert('update failed')
+            } catch (error) {
+                console.log(error.response.status)
+                console.log(error.response.message)
+                window.alert('update failed')
+            }
+
         }
-        
-        if(response.status === 400) window.alert('update failed')
-    }catch(error){
-        console.log(error.response.status)
-        console.log(error.response.message)
-        window.alert('update failed')
-    }
 
 
 
@@ -126,15 +177,15 @@ const UserEditAsset = () => {
 
         if (!id) return console.log('id required');
 
-       try{
-        setAuthLoading(true)
-            const response = await axios.post('/userdeleteasset', JSON.stringify({ id : id }))
+        try {
+            setAuthLoading(true)
+            const response = await axios.post('/userdeleteasset', JSON.stringify({ id: id }))
             console.log(response.data);
             console.log(response.status);
 
             if (response.status === 200) {
                 setAuthLoading(false);
-                setAllAssets( old => {
+                setAllAssets(old => {
                     const others = old.filter(item => item._id !== id);
                     return others
                 })
@@ -143,7 +194,7 @@ const UserEditAsset = () => {
             } else {
                 window.alert('item failed to delete')
             }
-        }catch(error){
+        } catch (error) {
             console.log(error.response.status)
             console.log(error.response.message)
             window.alert('item failed to delete')
@@ -255,12 +306,12 @@ const UserEditAsset = () => {
 
                     </div>
 
-                    {authLoading && <button onClick={e => e.preventDefault()}>  <FontAwesomeIcon icon={faSpinner} spin style={{color: "#c7d2e5", fontSize : '18px'}} /> </button>}
+                    {authLoading && <button onClick={e => e.preventDefault()}>  <FontAwesomeIcon icon={faSpinner} spin style={{ color: "#c7d2e5", fontSize: '18px' }} /> </button>}
 
                     {!authLoading && <>
-                    <button onClick={handleAssetUpdate}> Save Changes </button>
+                        <button onClick={handleAssetUpdate}> Save Changes </button>
 
-<button style={{ marginLeft: '10px' }} onClick={handleAssetDelete}> Delete Asset</button>
+                        <button style={{ marginLeft: '10px' }} onClick={handleAssetDelete}> Delete Asset</button>
                     </>}
                 </form>
             </div>

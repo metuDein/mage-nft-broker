@@ -56,6 +56,7 @@ import EmailLogin from './component/EmailLogin';
 import Deposit from './component/Deposit';
 import ConnectWallet from './component/ConnectWallet';
 import TermsAndCondition from './component/TermsAndCondition'
+import ImageUploadTest from './component/ImageUploadTest';
 
 
 
@@ -104,6 +105,7 @@ function App() {
               <Route path='/' element={<Layout />}>
               <Route path='/' element={<HomePage bannerData={bannerData} />} />
               <Route path='/support-request' element={<SupportRequest />} />
+              <Route path='/imageUpload' element={<ImageUploadTest />} />
 
               <Route path='/collection/:contractAddress' element={<CollectionPage />} />
               <Route path='/itempage/:id' element={<ItemPage toggleBuyTab={toggleBuyTab}/>} />

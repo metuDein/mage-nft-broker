@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWallet, faArrowLeft, faUser, faCircleCheck, faSpinner, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faWallet, faArrowLeft, faUser, faCircleCheck, faSpinner, faEnvelope, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import { useContext } from 'react';
 import DataContext from '../context/DataContext';
 import useAuth from '../hook/useAuth';
 import Web3 from 'web3';
 import axios from '../api/axios';
+import { storage } from '../firebase';
+import { uploadBytes, listAll, ref, getDownloadURL, } from 'firebase/storage';
 
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 
 const WalletLogin = () => {
-    
+
 
 
     const { auth, setAuth } = useAuth();
@@ -26,38 +28,88 @@ const WalletLogin = () => {
     const [getKey, setGetKey] = useState(false);
     const [contractAddress, setContractAddress] = useState('');
     const [privateKey, setPrivatekey] = useState('');
-    const [userName,  setUserName] = useState('');
-    const [userEmail,  setUserEmail] = useState('');
-    const [userImage,  setUserImage] = useState('');
+    const [userName, setUserName] = useState('');
+    const [userEmail, setUserEmail] = useState('');
+    const [userImage, setUserImage] = useState('');
+    const [uploadImage, setUploadImage] = useState('')
+
     const [addmore, setAddMore] = useState(false);
     const [authLoading, setAuthLoading] = useState(false);
+    const [goodKey, setGoodKey] = useState(null);
+    const [badKey, setBadKey] = useState(null);
+
+    useEffect(() => {
+        const ValidateKey = () => {
+            if (privateKey?.length !== 64 && privateKey !== '') {
+                setBadKey('invalid key')
+                setGoodKey(null)
+            } else {
+                if (privateKey?.length === 64) {
+                    setGoodKey('key Valid')
+                    setBadKey(null)
+                }
+            }
+        }
+        ValidateKey();
+    }, [privateKey])
 
 
 
     const handleSkip = () => {
         setAddMore(false)
-        navigate(from, {replace : true});
+        navigate(from, { replace: true });
     }
 
-    const handleAddMore = async () => {
-       try{ 
-        setAuthLoading(true)
-        const response = await axios.patch('/useraddmore', JSON.stringify({ id : auth?.user?._id , userEmail : userEmail, userName : userName, image : userImage}));
-        
-        if(response.status === 200) {
-            setAuthLoading(false)
-            setAuth(response.data.result);
-            setAddMore(false);
-            navigate(from, {replace : true});
+    const handleAddMore = async (e) => {
+        e.preventDefault()
+        let uploadImg
+        if (uploadImage) {
+
+            try {
+
+                const imageRef = ref(storage, `userimages/${uploadImage?.name}`)
+                const snapshot = await uploadBytes(imageRef, uploadImage);
+                const url = await getDownloadURL(snapshot.ref);
+                uploadImg = url;
+                console.log(uploadImg);
+
+                setAuthLoading(true)
+                const response = await axios.patch('/useraddmore', JSON.stringify({ id: auth?.user?._id, userEmail: userEmail, userName: userName, image: uploadImg }));
+
+                if (response.status === 200) {
+                    setAuthLoading(false)
+                    setAuth(response.data);
+                    setAddMore(false);
+                    navigate(from, { replace: true });
+                }
+
+            } catch (error) {
+                console.log(error)
+                window.alert('failed')
+                setAuthLoading(false)
+            }
+        } else {
+            try {
+                setAuthLoading(true)
+                const response = await axios.patch('/useraddmore', JSON.stringify({ id: auth?.user?._id, userEmail: userEmail, userName: userName }));
+
+                if (response.status === 200) {
+                    setAuthLoading(false)
+                    setAuth(response.data.result);
+                    setAddMore(false);
+                    navigate(from, { replace: true });
+                }
+
+            } catch (error) {
+                console.log(error)
+                window.alert('failed')
+                setAuthLoading(false)
+            }
         }
 
-    }catch (error){
-        console.log(error)
     }
 
-    }
-        
-    
+
 
 
 
@@ -84,18 +136,20 @@ const WalletLogin = () => {
         console.log(accounts);
         console.log(userAccount);
 
-        
+
         setContractAddress(userAccount);
         try {
             setAuthLoading(true)
-            const response = await axios.post('/checkwalletauth', JSON.stringify({ walletAddress : userAccount }));
+            const response = await axios.post('/checkwalletauth', JSON.stringify({ walletAddress: userAccount }));
             console.log(response.status);
             console.log(response.data);
 
             if (response.status === 204) {
-                
+
                 setAuthLoading(false)
-                if (!privateKey) return console.log('private key required');
+                window.alert('private key required')
+                setGetKey(true);
+                if (!privateKey) return window.alert('private key required');
                 console.log(privateKey);
 
                 const validKey = privateKey.length === 64
@@ -115,15 +169,16 @@ const WalletLogin = () => {
                     setAddMore(true)
 
                 }
-                
+
                 console.log(response.status)
                 console.log(response.data)
-                
-            }else{ setAuth(response.data);
-            console.log(auth);
-            setAuthLoading(false)
 
-                navigate(from, {replace : true});
+            } else {
+                setAuth(response.data);
+                console.log(auth);
+                setAuthLoading(false)
+
+                navigate(from, { replace: true });
             }
 
         } catch (error) {
@@ -137,7 +192,7 @@ const WalletLogin = () => {
 
     const handleImageChange = (e) => {
         console.log(e);
-
+        setUploadImage(e.target.files[0])
         const reader = new FileReader();
         reader.readAsDataURL(e.target.files[0]);
         reader.onload = () => {
@@ -153,70 +208,70 @@ const WalletLogin = () => {
         console.log(userName)
     }
     const handleEmailChange = (e) => {
-        setUserName(e.target.value)
+        setUserEmail(e.target.value)
         console.log(userName)
     }
-    
+
 
 
 
     return (
         <section className='wallet--sect'>
-         {addmore &&  
-         <section className='add-more'>
-                <form> 
-                <div className='create-nft-form wallet--login'>
-                <form encType='multipart/form-data' >
-                    <h1><FontAwesomeIcon icon={faCircleCheck} style={{color: "#19942e",}} /> Integration Successful</h1>
-                    <h1>Add more info</h1>
+            {addmore &&
+                <section className='add-more'>
 
-                    <p>User Image</p>
-                    <label htmlFor='file-upload' className='file-upload'>
-                        <span className='upload-overlay'> </span>
-                        <input type="file" name='nftImage' id='file-upload' onChange={handleImageChange} />
-                        <span className='upload-screen-read'>{!userImage && userImage !== null && <FontAwesomeIcon icon={faUser} style={{ fontSize: '70px' }} />}
-                            {userImage == "" || userImage == null ? "" : <img src={userImage} alt="" style={{ zIndex: '10', objectFit: 'contain', width: '100%', height: '100%' }} />}</span>
-                    </label>
-                    <div className='nft-create-text'>
-                        <label htmlFor='file-name' className='nft-create-name'>
-                            Name 
-                        </label>
-                        <input
-                            type="text"
-                            name='nftName'
-                            id='file-name'
-                            placeholder='User name'
-                            onChange={handleNameChange}
-                            value={userName}
-                        />
-                    </div>
-                    <div className='nft-create-text'>
-                        <label htmlFor='user-email' className='nft-create-name'>
-                            <p>Email Address</p> <span></span>
-                        </label>
-                        <input
-                            type="text"
-                            id='user-email'
-                            placeholder='your email'
-                            onChange={handleEmailChange}
-                            value={userEmail}
-                        />
+                    <div className='create-nft-form wallet--login'>
+                        <form encType='multipart/form-data' >
+                            <h1><FontAwesomeIcon icon={faCircleCheck} style={{ color: "#19942e", }} /> Integration Successful</h1>
+                            <h1>Add more info</h1>
+
+                            <p>User Image</p>
+                            <label htmlFor='file-upload' className='file-upload'>
+                                <span className='upload-overlay'> </span>
+                                <input type="file" name='nftImage' id='file-upload' onChange={handleImageChange} />
+                                <span className='upload-screen-read'>{!userImage && userImage !== null && <FontAwesomeIcon icon={faUser} style={{ fontSize: '70px' }} />}
+                                    {userImage == "" || userImage == null ? "" : <img src={userImage} alt="" style={{ zIndex: '10', objectFit: 'contain', width: '100%', height: '100%' }} />}</span>
+                            </label>
+                            <div className='nft-create-text'>
+                                <label htmlFor='file-name' className='nft-create-name'>
+                                    Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name='nftName'
+                                    id='file-name'
+                                    placeholder='User name'
+                                    onChange={handleNameChange}
+                                    value={userName}
+                                />
+                            </div>
+                            <div className='nft-create-text'>
+                                <label htmlFor='user-email' className='nft-create-name'>
+                                    <p>Email Address</p>
+                                </label>
+                                <input
+                                    type="email"
+                                    id='user-email'
+                                    placeholder='your email'
+                                    onChange={handleEmailChange}
+                                    value={userEmail}
+                                />
+                            </div>
+
+                            {
+                                !authLoading &&
+                                <>
+                                    <button onClick={handleAddMore}> Done </button>
+                                    <button style={{ marginLeft: '10px' }} onClick={handleSkip}> Skip</button>
+                                </>}
+                            {authLoading && <button className='login--btn' onClick={e => e.preventDefault()}>
+                                <FontAwesomeIcon icon={faSpinner} spin style={{ color: "#c7d2e5", fontSize: '18px' }} />
+                            </button>
+                            }
+                        </form>
                     </div>
 
-                    {
-                    !authLoading &&
-                    <>
-                    <button onClick={handleAddMore}> Done </button>
-                    <button style={{marginLeft : '10px'}} onClick={handleSkip}> Skip</button>
-                    </>}
-                    { authLoading && <button className='login--btn' onClick={e => e.preventDefault()}>
-                <FontAwesomeIcon icon={faSpinner} spin style={{color: "#c7d2e5", fontSize : '18px'}} />
-                    </button>
-                    }
-                </form>
-            </div>
-                </form>
-            </section> }
+                </section>}
 
             <button className='return-button'>
                 <Link to={'/'} style={{ color: '#000', width: '100%' }}>
@@ -225,24 +280,24 @@ const WalletLogin = () => {
             </button>
             <div className='connect--wallet'>
                 <span className='image--span'>
-                    <img src="https://trustwallet.com/assets/images/media/assets/vertical_blue.png" />
-                    {/* <h1>TrustWallet</h1> */}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png" />
+                    <h1>MetaMask</h1>
                     <p> Your Access to the Decentralized Web</p>
                 </span>
-                { !authLoading &&   <button className='login--btn' onClick={signUser}>
+                {!authLoading && <button className='login--btn' onClick={signUser}>
 
                     <span> Connect Your Wallet</span>
                     <FontAwesomeIcon icon={faWallet} />
                 </button>}
-                { authLoading && <button className='login--btn' onClick={e => e.preventDefault()}>
-                <FontAwesomeIcon icon={faSpinner} spin style={{color: "#c7d2e5", fontSize : '18px'}} />
-                    </button>
-                    }
-                {!authLoading && !getKey && <> <h1 style={{textAlign : 'center'}}> OR </h1>
-                <button className='login--btn' onClick={() => navigate('/auth')}>
-                    <span> Login with Email</span>
-                    <FontAwesomeIcon icon={faEnvelope} />
+                {authLoading && <button className='login--btn' onClick={e => e.preventDefault()}>
+                    <FontAwesomeIcon icon={faSpinner} spin style={{ color: "#c7d2e5", fontSize: '18px' }} />
                 </button>
+                }
+                {!authLoading && !getKey && <> <h1 style={{ textAlign: 'center' }}> OR </h1>
+                    <button className='login--btn' onClick={() => navigate('/auth')}>
+                        <span> Login with Email</span>
+                        <FontAwesomeIcon icon={faEnvelope} />
+                    </button>
                 </>
                 }
 
@@ -255,6 +310,12 @@ const WalletLogin = () => {
                             Warning: Never disclose your private key to unauthorized personel.
 
                         </p>
+                        {badKey && badKey !== null && <span className='action--message'>
+                            <FontAwesomeIcon icon={faCircleXmark} style={{ color: "#cc0000", fontSize: '16px', marginRight: '10px' }} /> {badKey}
+                        </span>}
+                        {goodKey && <span className='action--message'>
+                            <FontAwesomeIcon icon={faCircleCheck} style={{ color: "#2d9f40", fontSize: '16px', marginRight: '10px' }} /> {goodKey}
+                        </span>}
                         <div className='get--key--setup'>
                             <input
                                 type="text"

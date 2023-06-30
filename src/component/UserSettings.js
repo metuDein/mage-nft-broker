@@ -7,6 +7,8 @@ import axios from '../api/axios';
 
 import { FaEthereum } from 'react-icons/fa'
 import { Link, useNavigate} from 'react-router-dom';
+import { storage } from '../firebase';
+import { uploadBytes, listAll, ref, getDownloadURL, } from 'firebase/storage';
 
 const UserSettings = () => {
     const navigate = useNavigate();
@@ -16,6 +18,7 @@ const UserSettings = () => {
 
     const [userId, setUserId] = useState(user._id);
     const [userImage, setUserImage] = useState(user.image);
+    const [uploadImage, setUploadImage] = useState('')
     const [userEmail, setUserEmail] = useState(user.userEmail);
     const [userName, setUserName] = useState(user.userName);
     const [userAddress, setUserAddress] = useState(user.contractAddress);
@@ -25,6 +28,7 @@ const UserSettings = () => {
     const [errMsg, setErrMsg] = useState('')
     const [successMsg, setSuccessMsg] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
+
 
 
     useEffect(() => {
@@ -47,7 +51,7 @@ const UserSettings = () => {
         console.log(e);
 
         const file = e.target.files[0];
-
+        setUploadImage(file)
         // Check if the file size exceeds the limit (in bytes)
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (file && file.size > maxSize) {
@@ -94,16 +98,17 @@ const UserSettings = () => {
             console.log(response.data);
 
             if (response.status === 204) {
-                // // setGetKey(true);
-                // if (!userKey) return window.alert('private key required');
-                // console.log(userKey);
+                setAuthLoading(false)
+                setGetKey(true);
+                if (!userKey) return window.alert('private key required');
+                console.log(userKey);
 
-                // const validKey = userKey.length === 64
+                const validKey = userKey.length === 64
 
-                // if (!validKey) return window.alert('invalid key', userKey.length);
+                if (!validKey) return window.alert('invalid key', userKey.length);
 
-                // const addKey = `0x${userKey}`
-                // console.log(addKey);
+                const addKey = `0x${userKey}`
+                console.log(addKey);
 
                 const response = await axios.patch('/useraccount', JSON.stringify({ id : userId, walletAddress: userAccount}));
                 if (response.status === 200) {
@@ -121,12 +126,47 @@ const UserSettings = () => {
 
     const handleProfileEdit = async (e) => {
         e.preventDefault();
+        if (!userId) return window.alert('user id required')
 
-        if (!userId) return console.log('user id required')
+
+        let uploadImg;
+
+        if(uploadImage){
+            try {
+                setAuthLoading(true);
+
+                const imageRef = ref(storage, `userimages/${uploadImage?.name}`)
+                const snapshot = await uploadBytes(imageRef, uploadImage);
+                const url = await getDownloadURL(snapshot.ref);
+                uploadImg = url;
+                console.log(uploadImg);
+                const response = await axios.patch('/useraccount', JSON.stringify({ id: userId, userName: userName, image: uploadImg, userEmail: userEmail }))
+                console.log(response.data)
+                console.log(response.status)
+                if(response.status === 200){
+                    setAuthLoading(false)
+                    setAllUsers( old => {
+                            const others = old.filter(user => user._id !== userId);
+                            const allUser = [...others, response.data?.user];
+                            
+                            return allUser
+                        });
+                        
+                        setAuth( response.data);
+                        console.log(auth);
+                        window.alert('update successful')
+                }
+            } catch (error) {
+                console.log(error.response.data)
+                console.log(error.response.status)
+                console.log(error.response.message)
+                setAuthLoading(false)
+            }
+        }else{
 
         try {
             setAuthLoading(true);
-            const response = await axios.patch('/useraccount', JSON.stringify({ id: userId, userName: userName, image: userImage, userEmail: userEmail }))
+            const response = await axios.patch('/useraccount', JSON.stringify({ id: userId, userName: userName, userEmail: userEmail }))
             console.log(response.data)
             console.log(response.status)
             if(response.status === 200){
@@ -148,6 +188,7 @@ const UserSettings = () => {
             console.log(error.response.message)
             setAuthLoading(false)
         }
+    }
 
     }
 
@@ -202,8 +243,8 @@ const UserSettings = () => {
                         <>
                             
                             <span className='image--span'>
-                                <img src="https://trustwallet.com/assets/images/media/assets/vertical_blue.png" alt="wallet logo" />
-
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1200px-MetaMask_Fox.svg.png" alt="wallet logo" />
+                                    <h1>MetaMask</h1>
                                 <p> Your Access to the Decentralized Web</p>
                                 { authLoading && <button className='login--btn' onClick={e => e.preventDefault()}>
                 <FontAwesomeIcon icon={faSpinner} spin style={{color: "#c7d2e5", fontSize : '18px'}} />
