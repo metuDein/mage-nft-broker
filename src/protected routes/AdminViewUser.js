@@ -58,8 +58,8 @@ const user = allUsers.find(user => user._id === id);
                             Asssets <span></span>
                         </label>
                         <div className='related--items'>
-                            {userAssets?.length && userAssets}
-                            {!userAssets?.length && <p>no assets for this user</p>}
+                            {assets?.length && assets}
+                            {!assets?.length && <p>no assets for this user</p>}
 
                             
                         </div>

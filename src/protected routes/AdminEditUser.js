@@ -17,7 +17,7 @@ const AdminEditUser = () => {
     const user = allUsers.find(user => user._id === id);
     console.log(user);
 
-    const userAssets = allAssets.filter(asset => asset.OwnerName === user.userName || asset.token_address === user.contractAddress);
+    const userAssets = allAssets.filter(asset => asset.OwnerName === user.userName );
 
 
 

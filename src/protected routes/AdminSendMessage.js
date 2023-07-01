@@ -3,6 +3,8 @@ import DataContext from '../context/DataContext';
 import useAuth from '../hook/useAuth';
 import axios from '../api/axios';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -22,11 +24,11 @@ const AdminSendMessage = () => {
     
 
 
-    const [users, setUsers] = useState([]);
+    
     const [title, setTitle] = useState('')
     const [body, setBody] = useState('');
     const [User, setUser] = useState('');
-    const [authLoading, setAuthLoading] = useState
+    const [authLoading, setAuthLoading] = useState(false)
 
 
     const usersOpt = (
@@ -51,18 +53,17 @@ const AdminSendMessage = () => {
         e.preventDefault()
 
         if(!body || !title) return window.alert('all fields required')
-        setIsLoading(true);
+        setAuthLoading(true);
         try {
-            const response = await axios.post('/supportrequest', JSON.stringify({ senderAddress : user.contractAddress, sendername : 'TritonsPrimeAdmin',  receiver :  User, title : title, body :body,}));
+            const response = await axios.post('/supportrequest', JSON.stringify({ senderAddress : user.contractAddress, sendername : 'TritonsPrimeAdmin',  receiver :  User, title : title, body : body,}));
             console.log(response.data)
             console.log(response.status)
             if(response.status === 200) return alert('message sent');
+            setAuthLoading(false);
         } catch (error) {
             console.log(error.response.data)
             console.log(error.response.status)
-        }finally{
-            setIsLoading(false);
-            window.alert('Message Sent successfully')
+            setAuthLoading(false)
         }
     }
 
@@ -78,12 +79,12 @@ const AdminSendMessage = () => {
                     <h1>Send Messages to user</h1>
                     
                    
-                    <div className='nft-create-text'>
+                    {/* <div className='nft-create-text'>
                         <label htmlFor='file-name' className='nft-create-name'>
                             Name <span>*</span>
                         </label>
                        
-                    </div>
+                    </div> */}
                     <div className='nft-create-text'>
                         <label htmlFor='file-price' className='nft-create-name'>
                             Subject <span></span>
@@ -120,8 +121,11 @@ const AdminSendMessage = () => {
                         />
                     </div>
                     
-                    
-                    <button> Send </button>
+                    { authLoading && <button  onClick={e => e.preventDefault()}>
+                <FontAwesomeIcon icon={faSpinner} spin style={{color: "#c7d2e5", fontSize : '18px'}} />
+                    </button>
+                    }
+                    {!authLoading && <button> Send </button>}
                 </form>
             </div>
 
