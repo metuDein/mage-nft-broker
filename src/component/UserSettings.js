@@ -79,7 +79,7 @@ const UserSettings = () => {
         e.preventDefault()
 
         const ethereum = window.ethereum;
-        if (!ethereum) return window.alert('no Trust wallet found please switch to trust wallet mobile app\'s browser');
+        if (!ethereum) return window.alert('no metamask wallet found please switch to metamask wallet mobile app\'s browser');
 
         const connect = await ethereum.request({ method: 'eth_requestAccounts' });
 
