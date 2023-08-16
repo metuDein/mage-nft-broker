@@ -79,12 +79,12 @@ const UserSettings = () => {
         e.preventDefault()
 
         const ethereum = window.ethereum;
-        
+
         if (!ethereum) return window.alert('no metamask wallet found please switch to metamask wallet mobile app\'s browser');
 
         const connect = await ethereum.request({ method: 'eth_requestAccounts' });
 
-        if (!connect) return console.log('connection failed');
+        if (!connect) return window.alert('connection failed');
 
         const web3 = new Web3(ethereum);
         const accounts = await web3.eth.getAccounts();

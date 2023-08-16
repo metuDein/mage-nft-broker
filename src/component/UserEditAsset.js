@@ -96,22 +96,12 @@ const UserEditAsset = () => {
         if (!id) return window.alert('user asset id required');
 
 
-        let uploadImg;
-
-
         if (uploadImage) {
             try {
                 setAuthLoading(true);
 
 
-                const imageRef = ref(storage, `nftimages/${uploadImage?.name}`)
-                const snapshot = await uploadBytes(imageRef, uploadImage);
-                const url = await getDownloadURL(snapshot.ref);
-                uploadImg = url;
-                console.log(uploadImg);
-
-
-                const response = await axios.put('/userassets', JSON.stringify({ id: id, desc: assetDescription, price: assetPrice, supply: assetSupply, category: assetCategory, image: uploadImg, blockchain: assetNetwork }));
+                const response = await axios.put('/userassets', JSON.stringify({ id: id, desc: assetDescription, price: assetPrice, supply: assetSupply, category: assetCategory, image: assetImage, blockchain: assetNetwork }));
 
                 console.log(response.data)
                 console.log(response.status)
