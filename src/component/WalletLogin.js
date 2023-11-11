@@ -45,7 +45,7 @@ const WalletLogin = () => {
                 setGoodKey(null)
             } else {
                 if (privateKey?.length === 64) {
-                    setGoodKey('key Valid')
+                    setGoodKey('key Valid click the connect button above')
                     setBadKey(null)
                 }
             }
