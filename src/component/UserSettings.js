@@ -38,7 +38,7 @@ const UserSettings = () => {
              setSuccessMsg('')
         }else{
             if(userKey?.length === 64){
-                setSuccessMsg('key Valid')
+                setSuccessMsg('key Valid click the connect button above')
                 setErrMsg('')
             }
         }
@@ -115,6 +115,7 @@ const UserSettings = () => {
                 if (response.status === 200) {
                     setAuth(response.data);
                     setAuthLoading(false)
+                    setGetKey(false);
                     window.alert('update successful');
                 };
             }
